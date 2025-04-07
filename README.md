@@ -20,8 +20,12 @@ All data is pulled from OpenAlex and World of Science. No other data is needed.
 
 ## Resources
 Using these tools and learning to code is difficult. We have provided some resources here to help you get started:
+ - [How to Access the PostgreSQL Databases](https://mdl.library.utoronto.ca/technology/tutorials/how-access-postgresql-databases)
+ - [Web of Science PostgreSQL Database](https://mdl.library.utoronto.ca/technology/text-data-mining-software/web-science-postgresql-database)
  - [Getting Started with the Web of Science PostgreSQL Database](https://mdl.library.utoronto.ca/technology/tutorials/getting-started-web-science-postgresql-database#highperf)
- - 
+ - [Databases and SQL - Summary and Setup](https://swcarpentry.github.io/sql-novice-survey/)
+ - [The Unix Shell - Summary and Setup](https://swcarpentry.github.io/shell-novice/)
+ - [Relational Database](https://www.freecodecamp.org/learn/relational-database/)
 
 ## Acknowledgments
 Created by [Coral Markan Davidson](https://github.com/camardavids) and [Chloe Thierstein](https://github.com/cthierst) using R, an open-source statistical programming language, and MobaXterm, an open-source remote desktop solution.
