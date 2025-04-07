@@ -16,7 +16,12 @@ Following the download of RStudio, you will need to download the packages associ
 -   `readxl`
 
 ## Downloading Data
-Downloading data separately is not necessary to run the code files as they pull directly from the sources.
+All data is pulled from OpenAlex and World of Science. No other data is needed.
+
+## Resources
+Using these tools and learning to code is difficult. We have provided some resources here to help you get started:
+ - `https://mdl.library.utoronto.ca/technology/tutorials/getting-started-web-science-postgresql-database#highperf`
+ - 
 
 ## Acknowledgments
 Created by [Coral Markan Davidson](https://github.com/camardavids) and [Chloe Thierstein](https://github.com/cthierst) using R, an open-source statistical programming language, and MobaXterm, an open-source remote desktop solution.
