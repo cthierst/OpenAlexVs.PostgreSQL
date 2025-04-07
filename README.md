@@ -15,6 +15,6 @@ Following the download of RStudio, you will need to download the packages associ
 Downloading data separately is not necessary to run the code files as they pull directly from the sources.
 
 ## Acknowledgments
-Created by [Coral Markan Davidson](https://github.com/camardavids) and [Chloe Thierstein](https://github.com/cthierst). Created using R, an open-source statistical programming language, and MobaXterm, an open-source remote desktop solution.
+Created by [Coral Markan Davidson](https://github.com/camardavids) and [Chloe Thierstein](https://github.com/cthierst) using R, an open-source statistical programming language, and MobaXterm, an open-source remote desktop solution.
 
 We would like to give special thanks to [Leslie Barnes](https://onesearch.library.utoronto.ca/library-staff/leslie-barnes) for her invaluable help, guidance, and insight on this project. Much of this project's development is credited to her help. 
