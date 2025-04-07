@@ -20,7 +20,7 @@ All data is pulled from OpenAlex and World of Science. No other data is needed.
 
 ## Resources
 Using these tools and learning to code is difficult. We have provided some resources here to help you get started:
- - `[Getting Started with the Web of Science PostgreSQL Database](https://mdl.library.utoronto.ca/technology/tutorials/getting-started-web-science-postgresql-database#highperf)`
+ - [Getting Started with the Web of Science PostgreSQL Database](https://mdl.library.utoronto.ca/technology/tutorials/getting-started-web-science-postgresql-database#highperf)
  - 
 
 ## Acknowledgments
