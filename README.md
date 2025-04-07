@@ -10,3 +10,11 @@ The code requires RStudio and MobaXterm. To run the code stored in this github, 
 
 Following the download of RStudio, you will need to download the packages associated with this project. These are:
 -   `dplyr`
+
+## Downloading Data
+Downloading data separately is not necessary to run the code files as they pull directly from the sources.
+
+## Acknowledgments
+Created by Coral Markan Davidson and Chloe Thierstein. Created using R, an open-source statistical programming language, and MobaXterm, an open-source remote desktop solution.
+
+We would like to give special thanks to [Leslie Barnes](https://onesearch.library.utoronto.ca/library-staff/leslie-barnes)
