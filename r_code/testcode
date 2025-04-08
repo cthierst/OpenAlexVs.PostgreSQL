@@ -16,8 +16,7 @@ works_search <- oa_fetch(
   corresponding_institution_ids = "https://openalex.org/I185261750",  # University of Toronto
   type = "article",
 )
-#> Requesting url: https://api.openalex.org/works?filter=title.search%3Abibliometric%20analysis%7Cscience%20mapping%2Ccited_by_count%3A%3E50%2Cfrom_publication_date%3A2020-01-01%2Cto_publication_date%3A2021-12-31&sort=cited_by_count%3Adesc
-#> Getting 2 pages of results with a total of 376 records...
+
 works_search |>
   show_works() |>
   knitr::kable()
