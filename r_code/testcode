@@ -1,0 +1,21 @@
+# Load the necessary libraries
+library(openalexR)  # For fetching data from OpenAlex API
+library(tidyverse)  # For data manipulation (e.g., tibble)
+library(writexl)    # For exporting to Excel (optional)
+
+# Set up email for OpenAlex API requests
+options(openalexR.mailto = "coral.markan@mail.utoronto.ca")
+
+works_search <- oa_fetch(
+  entity = "works",
+  locations.source.publisher_lineage = "https://openalex.org/P4310319965",  # Springer publisher
+  from_publication_date = "2020-01-01",
+  to_publication_date = "2021-12-31",
+  corresponding_institution_ids = "https://openalex.org/I185261750",  # University of Toronto
+  type = "article",
+)
+#> Requesting url: https://api.openalex.org/works?filter=title.search%3Abibliometric%20analysis%7Cscience%20mapping%2Ccited_by_count%3A%3E50%2Cfrom_publication_date%3A2020-01-01%2Cto_publication_date%3A2021-12-31&sort=cited_by_count%3Adesc
+#> Getting 2 pages of results with a total of 376 records...
+works_search |>
+  show_works() |>
+  knitr::kable()
