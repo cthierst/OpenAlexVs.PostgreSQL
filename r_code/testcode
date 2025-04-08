@@ -1,3 +1,5 @@
+## This code pulls all of the data but it is still creating dataframes inside the dataframe - trying to troubleshoot this issue so we can at least have the plain data ##
+
 # Load the necessary libraries
 library(openalexR)  # For fetching data from OpenAlex API
 library(tidyverse)  # For data manipulation (e.g., tibble)
