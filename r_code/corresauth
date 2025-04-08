@@ -1,173 +1,110 @@
+# Load the necessary libraries
+library(tidyverse)  # For data manipulation
+library(openalexR)  # For fetching data from OpenAlex API
+library(writexl)    # For exporting data to Excel
 
-
-library(tidyverse)
-library(openalexR)
-library(writexl)
-
+# Set up email for OpenAlex API requests
 options(openalexR.mailto = "coral.markan@mail.utoronto.ca")
 
-# Fetch data from OpenAlex API as a list
-springer_works <- oa_fetch(
+# Fetch the data from OpenAlex API
+springer_data <- oa_fetch(
   entity = "works", 
-  locations.source.publisher_lineage = "https://openalex.org/P4310319965", 
-  from_publication_date = "2019-01-01",
-  to_publication_date = "2024-12-31",
-  corresponding_institution_ids = "https://openalex.org/I185261750",
-  output = "list"  # Change output to "list"
+  locations.source.publisher_lineage = "https://openalex.org/P4310319965",  # Springer publisher
+  from_publication_date = "2019-01-01",  # Starting date
+  to_publication_date = "2024-12-31",    # Ending date
+  corresponding_institution_ids = "https://openalex.org/I185261750",  # University of Toronto
+  type = "article",
+  output = "list"  # Fetch the data in list format
 )
 
-# Check if any records were found
-if (length(springer_works) == 0) {
-  stop("No records found from the API")
+# If there is no data, stop the code
+if (length(springer_data) == 0) {
+  stop("No records found.")
 }
 
-cat("Found", length(springer_works), "publications\n")
+# Print the number of publications found
+print(paste("Found", length(springer_data), "publications."))
 
-# Print a sample of the first record to understand the structure of the list
-cat("First record sample:\n")
-print(springer_works[[1]])
-
-# Create functions to safely extract values from list columns
-extract_first_author <- function(records) {
-  result <- vector("character", length(records))
-  for (i in 1:length(records)) {
-    auth <- records[[i]]$authorships
-    if (is.list(auth) && length(auth) > 0 && is.list(auth[[1]]) && 
-        "author" %in% names(auth[[1]]) && is.list(auth[[1]]$author) && 
-        "display_name" %in% names(auth[[1]]$author)) {
-      result[i] <- auth[[1]]$author$display_name
+# Function to get the first author from each publication
+get_first_author <- function(data) {
+  first_authors <- vector("character", length(data))  # Empty list for first authors
+  for (i in 1:length(data)) {  # Go through each record
+    if (length(data[[i]]$authorships) > 0) {
+      first_authors[i] <- data[[i]]$authorships[[1]]$author$display_name  # Get the first author's name
     } else {
-      result[i] <- NA
+      first_authors[i] <- NA  # If no authors, put NA
     }
   }
-  return(result)
+  return(first_authors)  # Return the list of first authors
 }
 
-# Example of extracting all authors
-extract_all_authors <- function(records) {
-  result <- vector("character", length(records))
-  for (i in 1:length(records)) {
-    auth <- records[[i]]$authorships
-    if (is.list(auth) && length(auth) > 0) {
-      author_names <- sapply(auth, function(a) {
-        if (is.list(a) && "author" %in% names(a) && 
-            is.list(a$author) && "display_name" %in% names(a$author)) {
-          return(a$author$display_name)
+# Function to get all authors from each publication
+get_all_authors <- function(data) {
+  all_authors <- vector("character", length(data))  # Empty list for all authors
+  for (i in 1:length(data)) {  # Go through each record
+    authorship_info <- data[[i]]$authorships  # Get authorship info for each record
+    if (length(authorship_info) > 0) {
+      author_names <- sapply(authorship_info, function(auth) {
+        return(auth$author$display_name)  # Get each author's name
+      })
+      all_authors[i] <- paste(author_names, collapse = "; ")  # Combine names with semicolons
+    } else {
+      all_authors[i] <- NA  # If no authors, put NA
+    }
+  }
+  return(all_authors)  # Return the list of all authors
+}
+
+# Function to get the corresponding author(s) from each publication
+get_corresponding_author <- function(data) {
+  corresponding_authors <- vector("character", length(data))  # Empty list for corresponding authors
+  for (i in 1:length(data)) {  # Go through each record
+    authorship_info <- data[[i]]$authorships  # Get authorship info for each record
+    if (length(authorship_info) > 0) {
+      cor_authors <- sapply(authorship_info, function(auth) {
+        if (!is.null(auth$is_corresponding) && auth$is_corresponding == TRUE) {
+          return(auth$author$display_name)  # Get corresponding author's name
         } else {
-          return(NA)
+          return(NA)  # If not a corresponding author, return NA
         }
       })
-      result[i] <- paste(author_names[!is.na(author_names)], collapse = "; ")
+      corresponding_authors[i] <- paste(cor_authors[!is.na(cor_authors)], collapse = "; ")  # Combine corresponding authors
     } else {
-      result[i] <- NA
+      corresponding_authors[i] <- NA  # If no corresponding authors, put NA
     }
   }
-  return(result)
+  return(corresponding_authors)  # Return the list of corresponding authors
 }
 
-# Extract corresponding authors
-extract_corresponding_authors <- function(records) {
-  result <- vector("character", length(records))
-  for (i in 1:length(records)) {
-    auth <- records[[i]]$authorships
-    if (is.list(auth) && length(auth) > 0) {
-      corresponding_authors <- sapply(auth, function(a) {
-        if (is.list(a) && "author" %in% names(a) && 
-            is.list(a$author) && "display_name" %in% names(a$author) &&
-            !is.null(a$is_corresponding) && a$is_corresponding == TRUE) {
-          return(a$author$display_name)
-        } else {
-          return(NA)
-        }
-      })
-      valid_authors <- corresponding_authors[!is.na(corresponding_authors)]
-      result[i] <- if(length(valid_authors) > 0) paste(valid_authors, collapse = "; ") else NA
+# Function to get the publication date from each record
+get_publication_date <- function(data) {
+  publication_dates <- vector("character", length(data))  # Empty list for publication dates
+  for (i in 1:length(data)) {  # Go through each record
+    if (!is.null(data[[i]]$publication_date)) {
+      publication_dates[i] <- data[[i]]$publication_date  # Get the publication date
     } else {
-      result[i] <- NA
+      publication_dates[i] <- NA  # If no publication date, put NA
     }
   }
-  return(result)
+  return(publication_dates)  # Return the list of publication dates
 }
 
-# Extract journal name
-extract_journal_name <- function(records) {
-  result <- vector("character", length(records))
-  for (i in 1:length(records)) {
-    hv <- records[[i]]$host_venue
-    if (is.list(hv) && length(hv) > 0 && "display_name" %in% names(hv)) {
-      result[i] <- hv$display_name
-    } else {
-      result[i] <- NA
-    }
-  }
-  return(result)
-}
+# Get the data we need from the records
+first_authors <- get_first_author(springer_data)
+all_authors <- get_all_authors(springer_data)
+corresponding_authors <- get_corresponding_author(springer_data)
+publication_dates <- get_publication_date(springer_data)
 
-# Extract journal ISSN
-extract_journal_issn <- function(records) {
-  result <- vector("character", length(records))
-  for (i in 1:length(records)) {
-    hv <- records[[i]]$host_venue
-    if (is.list(hv) && length(hv) > 0 && "issn" %in% names(hv) && 
-        is.list(hv$issn) && length(hv$issn) > 0) {
-      result[i] <- paste(hv$issn, collapse = "; ")
-    } else {
-      result[i] <- NA
-    }
-  }
-  return(result)
-}
-
-# Extract APC information
-extract_apc_info <- function(records, apc_field) {
-  result <- vector("character", length(records))
-  for (i in 1:length(records)) {
-    if (is.list(records[[i]]$apc_list) && length(records[[i]]$apc_list) > 0 && 
-        apc_field %in% names(records[[i]]$apc_list)) {
-      result[i] <- as.character(records[[i]]$apc_list[[apc_field]])
-    } else {
-      result[i] <- NA
-    }
-  }
-  return(result)
-}
-
-# Process the list of records
-processed_list <- lapply(springer_works, function(record) {
-  list(
-    first_author = extract_first_author(springer_works),
-    all_authors = extract_all_authors(springer_works),
-    corresponding_authors = extract_corresponding_authors(springer_works),
-    journal_name = extract_journal_name(springer_works),
-    journal_issn = extract_journal_issn(springer_works),
-    apc_value = extract_apc_info(springer_works, "value"),
-    apc_currency = extract_apc_info(springer_works, "currency"),
-    apc_value_usd = extract_apc_info(springer_works, "value_usd"),
-    `Corresponding Y/N` = "Y"
-  )
-})
-
-# Convert processed data into a flat format for exporting
-flattened_data <- bind_rows(processed_list)
-
-# Export the data to Excel
-write_xlsx(flattened_data, "allapcinfo_springer_works_all_columns.xlsx")
-cat("Successfully exported data with OpenAlex works\n")
-
-# Condensed version with key columns
-selected_columns <- c(
-  "id", "title", "display_name", "first_author", "all_authors", "corresponding_authors",
-  "journal_name", "journal_issn", "publication_date", "publication_year", "doi", 
-  "type", "cited_by_count", "is_open_access", "open_access_status", 
-  "apc_value", "apc_currency", "apc_value_usd", "Corresponding Y/N"
+# Create a simple table with the required columns
+final_table <- tibble(
+  id = sapply(springer_data, function(x) x$id),  # Extract publication ID
+  title = sapply(springer_data, function(x) x$title),  # Extract title
+  first_author = first_authors,  # Extract first author
+  all_authors = all_authors,  # Extract all authors
+  corresponding_author = corresponding_authors,  # Extract corresponding author
+  publication_date = publication_dates  # Extract publication date
 )
 
-# Filter for selected columns
-selected_columns <- selected_columns[selected_columns %in% colnames(flattened_data)]
-
-# Create and export the condensed version
-springer_export_condensed <- flattened_data %>%
-  select(all_of(selected_columns))
-
-write_xlsx(springer_export_condensed, "allapcinfo_springer_works_key_columns.xlsx")
-cat("Exported condensed version with key columns\n")
+# Export the data to an Excel file
+write_xlsx(final_table, "springer_publications_full.xlsx")
+print("Data exported to Excel successfully.")
