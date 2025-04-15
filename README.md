@@ -9,11 +9,9 @@ This repository contains all input files necessary to extract Univeristy of Toro
 The code requires [RStudio](https://posit.co/download/rstudio-desktop/) and [MobaXterm](https://mobaxterm.mobatek.net/). To run the code stored in this github, you will need to have both of these installed. We recommend using RStudio on your local computer or Posit Cloud as your IDE. To use PostgreSQL you will need to have access from your institution and follow steps to be permitted access. This is a link to the University of Toronto's guide on access PostgreSQL: [How to Access the PostgreSQL Databases](https://mdl.library.utoronto.ca/technology/tutorials/how-access-postgresql-databases)
 
 Following the download of RStudio, you will need to download the packages associated with this project. These are:
--   `ggplot2`
 -   `tidyverse`
 -   `openalexR`
 -   `writexl`
--   `readxl`
 
 ## Downloading Data
 All data is pulled from OpenAlex and World of Science. No other data is needed.
