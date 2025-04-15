@@ -1,5 +1,5 @@
 #### Preamble ####
-# Purpose: Pulls a selection of data from the OpenAlex API for collection development purposes
+# Purpose: Pulls a selection of data our of a nested list from the OpenAlex API for collection development purposes
 # Author: Chloe Thierstein & Coral Markan Davidson
 # Contact: chloe.thierstein@utoronto.ca & coral.markan@mail.utoronto.ca
 # Date: April 15, 2025
