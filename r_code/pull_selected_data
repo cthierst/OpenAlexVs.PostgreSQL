@@ -226,7 +226,72 @@ issn_info <- lapply(springer_data, function(data) {
 
 ### Convert issn data into a data frame ###
 issn_df <- as.data.frame(do.call(rbind, issn_info), stringAsFactors = FALSE)
-                     
+
+### Function to pull by year data from each publication out of nested list ###
+biblio_info <- lapply(springer_data, function(data) {
+  if (!is.null(data$biblio) && length(data$biblio) > 0) {
+    bib_entry <- data$biblio
+    return(c(
+      volume = if (!is.null(bib_entry$volume)) bib_entry$volume else NA,
+      issue = if (!is.null(bib_entry$issue)) bib_entry$issue else NA,
+      first_page = if (!is.null(bib_entry$first_page)) bib_entry$first_page else NA,
+      last_page = if (!is.null(bib_entry$last_page)) bib_entry$last_page else NA
+    ))
+  } else {
+    return(c(
+      volume = NA,
+      issue = NA,
+      first_page = NA,
+      last_page = NA
+    ))
+}})
+
+### Convert biblio data into a data frame ###
+biblio_df <- as.data.frame(do.call(rbind, biblio_info), stringsAsFactors = FALSE)
+
+### Function to pull publisher data from each publication out of nested list ###
+pub_info <- lapply(springer_data, function(data) {
+  pub_info_var <- data$primary_location$source$host_organization_lineage_names
+  
+  if (length(pub_info_var) == 1) {
+    c(
+      division = if(!is.null(pub_info_var[[1]])) pub_info_var[[1]] else NA,
+      publisher = NA
+    )
+  } else if (length(pub_info_var) == 2) {
+    c(
+      division = if(!is.null(pub_info_var[[1]])) pub_info_var[[1]] else NA,
+      publisher = if(!is.null(pub_info_var[[2]])) pub_info_var[[2]] else NA
+    )
+  } else {
+    c(
+      division = NA,
+      publisher = NA
+    )
+  }
+})
+
+### Convert publisher data into a data frame ###
+pub_df <- as.data.frame(do.call(rbind, pub_info), stringAsFactors = FALSE)
+
+### Function to pull license data from each publication out of nested list ###
+license_info <- lapply(springer_data, function(data) {
+  license_var <- data$primary_location$license
+  
+  if (!is.null(license_var) && length(license_var) > 0) {
+    c(
+      license = license_var
+    )
+  } else {
+    c(
+      license = NA
+    )
+  }
+})
+
+### Convert license data into a data frame ###
+license_df <- as.data.frame(do.call(rbind, license_info), stringsAsFactors = FALSE)
+
 ### Pull author and publication date data ###
 first_authors <- get_first_author(springer_data)
 all_authors <- get_all_authors(springer_data)
@@ -262,8 +327,15 @@ final_table <- tibble(
   openaccess_oa_url = oa_df[, "openaccess_oa_url"],
   openaccess_any_repository_has_fulltext = oa_df[, "openaccess_any_repository_has_fulltext"],
   display_name = display_name_df[, "display_name"],
+  division = pub_df[, "division"],
+  publisher = pub_df[, "publisher"],
   issn_1 = issn_df[, "issn_1"],
-  issn_2 = issn_df[, "issn_2"]
+  issn_2 = issn_df[, "issn_2"],
+  volume = biblio_df[, "volume"],
+  issue = biblio_df[, "issue"],
+  first_page = biblio_df[, "first_page"],
+  last_page = biblio_df[, "last_page"],
+  license = license_df[, "license"]
 )
 
 ### Ensure language is a character vector ###
@@ -278,9 +350,11 @@ names(final_table) <- c(
   "Publication Date", "Publication Year", "DOI", "Language", "Cited by Count", 
   "FWCI", "Type", "APC Value", "APC Currency", "APC Value (USD)", "Grants Funder", 
   "Grant Funder", "Grant Award ID", "Counts by Year (Year)", "Counts by Year (Counts)", 
-  "Is OA", "OA Status", "OA URL", "Any Repository has Full Text", "Journal", 
-  "ISSN 1", "ISSN 2"
+  "Is OA", "OA Status", "OA URL", "Any Repository has Full Text", "Journal", "Division", "Publisher",
+  "ISSN 1", "ISSN 2", "Volume", "Issue", "First Page", "Last Page", "License"
 )
+
+
 ### Export data to an Excel file ###
 write_xlsx(final_table, "selected_data.xlsx")
 
