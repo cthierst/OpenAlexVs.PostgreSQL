@@ -297,6 +297,9 @@ names(final_table)[names(final_table) == "openaccess_is_oa"] <- "Is OA"
 names(final_table)[names(final_table) == "openaccess_oa_status"] <- "OA Status"
 names(final_table)[names(final_table) == "openaccess_oa_url"] <- "OA URL"
 names(final_table)[names(final_table) == "openaccess_any_repository_has_fulltext"] <- "Any Repository has Full Text"
+names(final_table)[names(final_table) == "display_name"] <- "Journal"
+names(final_table)[names(final_table) == "issn_1"] <- "ISSN 1"
+names(final_table)[names(final_table) == "issn_2"] <- "ISSN 2"
 
 ### Export data to an Excel file ###
 write_xlsx(final_table, "selected_data.xlsx")
