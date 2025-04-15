@@ -243,8 +243,8 @@ final_table <- tibble(
   all_authors = all_authors, 
   corresponding_author = corresponding_authors, 
   publication_date = publication_dates,
-  doi = sapply(springer_data, function(x) x$doi),
   publication_year = sapply(springer_data, function(x) x$publication_year),
+  doi = sapply(springer_data, function(x) x$doi),
   language = sapply(springer_data, function(x) x$language),
   cited_by_count = sapply(springer_data, function(x) x$cited_by_count),
   fwci = sapply(springer_data, function(x) ifelse(is.null(x$fwci), NA, x$fwci)),
@@ -271,6 +271,32 @@ final_table$language <- as.character(final_table$language)
 
 ### Ensure FWCI is numeric ###
 final_table$fwci <- as.numeric(final_table$fwci)
+
+### Recoding table titles for readability ###
+names(final_table)[names(final_table) == "id"] <- "ID"
+names(final_table)[names(final_table) == "title"] <- "Title"
+names(final_table)[names(final_table) == "first_author"] <- "First Author"
+names(final_table)[names(final_table) == "all_authors"] <- "All Authors(s)"
+names(final_table)[names(final_table) == "corresponding_author"] <- "Corresponding Author(s)"
+names(final_table)[names(final_table) == "publication_date"] <- "Publication Date"
+names(final_table)[names(final_table) == "publication_year"] <- "Publication Year"
+names(final_table)[names(final_table) == "doi"] <- "DOI"
+names(final_table)[names(final_table) == "language"] <- "Language"
+names(final_table)[names(final_table) == "cited_by_count"] <- "Cited by Count"
+names(final_table)[names(final_table) == "fwci"] <- "FWCI"
+names(final_table)[names(final_table) == "type"] <- "Type"
+names(final_table)[names(final_table) == "apc_value"] <- "APC Value"
+names(final_table)[names(final_table) == "apc_currency"] <- "APC Currency"
+names(final_table)[names(final_table) == "apc_value_usd"] <- "APC Value (USD)"
+names(final_table)[names(final_table) == "grants_funder"] <- "Grants Funder"
+names(final_table)[names(final_table) == "grants_funder_display_name"] <- "Grant Funder"
+names(final_table)[names(final_table) == "grants_award_id"] <- "Grant Award ID"
+names(final_table)[names(final_table) == "cby_year"] <- "Counts by Year (Year)"
+names(final_table)[names(final_table) == "cby_count"] <- "Counts by Year (Counts)"
+names(final_table)[names(final_table) == "openaccess_is_oa"] <- "Is OA"
+names(final_table)[names(final_table) == "openaccess_oa_status"] <- "OA Status"
+names(final_table)[names(final_table) == "openaccess_oa_url"] <- "OA URL"
+names(final_table)[names(final_table) == "openaccess_any_repository_has_fulltext"] <- "Any Repository has Full Text"
 
 ### Export data to an Excel file ###
 write_xlsx(final_table, "selected_data.xlsx")
