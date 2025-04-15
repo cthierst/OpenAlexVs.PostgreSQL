@@ -1,5 +1,5 @@
 #### Preamble ####
-# Purpose: Pulls a selection of data our of a nested list from the OpenAlex API for collection development purposes
+# Purpose: Pulls a selection of data from the OpenAlex API for collection development purposes
 # Author: Chloe Thierstein & Coral Markan Davidson
 # Contact: chloe.thierstein@utoronto.ca & coral.markan@mail.utoronto.ca
 # Date: April 15, 2025
@@ -247,7 +247,7 @@ final_table <- tibble(
   publication_year = sapply(springer_data, function(x) x$publication_year),
   language = sapply(springer_data, function(x) x$language),
   cited_by_count = sapply(springer_data, function(x) x$cited_by_count),
-  fwci = sapply(springer_data, function(x) x$fwci),
+  fwci = sapply(springer_data, function(x) ifelse(is.null(x$fwci), NA, x$fwci)),
   type = sapply(springer_data, function(x) x$type),
   apc_value = apc_df[, "apc_value"],
   apc_currency = apc_df[, "apc_currency"],
@@ -266,8 +266,17 @@ final_table <- tibble(
   issn_2 = issn_df[, "issn_2"]
 )
 
+### Ensure language is a character vector ###
+final_table$language <- as.character(final_table$language)
+
+### Ensure FWCI is numeric ###
+final_table$fwci <- as.numeric(final_table$fwci)
+
 ### Export data to an Excel file ###
 write_xlsx(final_table, "springer_publications_partialcorrespauth.xlsx")
+
+### Tell user the data is exported ###
+print("Data exported to Excel successfully.")
 
 ### Tell user the data is exported ###
 print("Data exported to Excel successfully.")
