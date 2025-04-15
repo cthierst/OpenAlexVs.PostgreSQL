@@ -1,0 +1,14 @@
+SELECT COUNT (DISTINCT (publication.id)) 
+FROM publication 
+JOIN source ON source.id = publication.source_id  
+JOIN publisher ON publisher.id = source.publisher_id 
+JOIN author ON author.wos_id = publication.id  
+JOIN author_address ON author_address.author_id = author.id 
+JOIN address ON address.id = author-address.address_id  
+JOIN openaccess.wos_id = publication.id 
+LEFT JOIN publication_grant ON publication_grant.wos_id = publication.id 
+LEFT JOIN grant_data ON grant_data.id = publication_grant.grant_id 
+LEFT JOIN reference ON reference.citing_id = publication.id 
+WHERE publication.year BETWEEN 2019 AND 2024 
+AND publisher.unified_name ILIKE ‘%Springer%’ 
+AND address.address ILIKE ‘%Univ Toronto%’; 
