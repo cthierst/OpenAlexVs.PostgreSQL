@@ -1,99 +1,107 @@
-# THIS CODE PULLS ID, TITLE, FIRST AUTHOR, ALL AUTHORS, CORRESPONDING AUTHOR(S), PUB DATE, DOI, PUB YEAR, LANGUAGE< CITED BY COUNT, FQCI, TYPE, APC VALUE, APC CURRENCY, APC VALUE USD, GRANTS FUNDER, GRANTS FUNDER DISPLAY NAME, GRANTS AWARD ID, CBY YEAR, CBY COUNT, IS OA, OA STATUS, OA URL, ANY REPOS HAS FULL TEXT, PUB DISPLAY NAME, 
+#### Preamble ####
+# Purpose: Pulls a selection of data from the OpenAlex API for collection development purposes
+# Author: Chloe Thierstein & Coral Markan Davidson
+# Contact: chloe.thierstein@utoronto.ca & coral.markan@mail.utoronto.ca
+# Date: April 15, 2025
+# License: MIT
+# Pre-requisites: Need to have necessary packages downloaded and API set up for yourself.
 
-# Load the necessary libraries
-library(tidyverse)  # For data manipulation
-library(openalexR)  # For fetching data from OpenAlex API
-library(writexl)    # For exporting data to Excel
+### Workspace setup ###
+library(tidyverse) 
+library(openalexR)  
+library(writexl)    
 
-# Set up email for OpenAlex API requests
+#### API set up ####
+
+### Set up email for OpenAlex API requests ###
 options(openalexR.mailto = "coral.markan@mail.utoronto.ca")
 
-# Fetch the data from OpenAlex API
+### Fetch the data from OpenAlex API ###
 springer_data <- oa_fetch(
   entity = "works", 
-  locations.source.publisher_lineage = "https://openalex.org/P4310319965",  # Springer publisher
-  from_publication_date = "2019-01-01",  # Starting date
-  to_publication_date = "2024-12-31",    # Ending date
-  corresponding_institution_ids = "https://openalex.org/I185261750",  # University of Toronto
-  type = "article",
-  output = "list"  # Fetch the data in list format
+  locations.source.publisher_lineage = "https://openalex.org/P4310319965",  # Selects the publisher
+  from_publication_date = "2019-01-01",  # Selects the starting date
+  to_publication_date = "2024-12-31",    # Selects the ending date
+  corresponding_institution_ids = "https://openalex.org/I185261750",  # Selects the Institution
+  type = "article", # Selects the item type
+  output = "list"  # pulls the data into a list
 )
 
-# If there is no data, stop the code
+### Condition to stop code and indicate if there is no data available ###
 if (length(springer_data) == 0) {
   stop("No records found.")
 }
 
-# Print the number of publications found
+### Print the number of publications found ###
 print(paste("Found", length(springer_data), "publications."))
 
-# Function to get the first author from each publication
+#### Pulling and organizing data ####
+
+### Function to pull the first author from each publication our of nested list ###
 get_first_author <- function(data) {
-  first_authors <- vector("character", length(data))  # Empty list for first authors
-  for (i in 1:length(data)) {  # Go through each record
+  first_authors <- vector("character", length(data))  # Creates empty list for first authors
+  for (i in 1:length(data)) {  # Goes through each record
     if (length(data[[i]]$authorships) > 0) {
-      first_authors[i] <- data[[i]]$authorships[[1]]$author$display_name  # Get the first author's name
+      first_authors[i] <- data[[i]]$authorships[[1]]$author$display_name  # Gets the first author's name
     } else {
       first_authors[i] <- NA  # If no authors, put NA
     }
   }
-  return(first_authors)  # Return the list of first authors
+  return(first_authors)  # Returns the list of first authors
 }
 
-# Function to get all authors from each publication
+### Function to pull all authors from each publication out of nested list ###
 get_all_authors <- function(data) {
-  all_authors <- vector("character", length(data))  # Empty list for all authors
-  for (i in 1:length(data)) {  # Go through each record
-    authorship_info <- data[[i]]$authorships  # Get authorship info for each record
+  all_authors <- vector("character", length(data))  
+  for (i in 1:length(data)) {  
+    authorship_info <- data[[i]]$authorships  
     if (length(authorship_info) > 0) {
       author_names <- sapply(authorship_info, function(auth) {
-        return(auth$author$display_name)  # Get each author's name
+        return(auth$author$display_name)  
       })
-      all_authors[i] <- paste(author_names, collapse = "; ")  # Combine names with semicolons
+      all_authors[i] <- paste(author_names, collapse = "; ")  # Combines authors names with semicolons
     } else {
-      all_authors[i] <- NA  # If no authors, put NA
+      all_authors[i] <- NA  
     }
   }
-  return(all_authors)  # Return the list of all authors
+  return(all_authors) 
 }
 
-# Function to get the corresponding author(s) from each publication
+### Function to pull corresponding author(s) from each publication out of nested list ###
 get_corresponding_author <- function(data) {
-  corresponding_authors <- vector("character", length(data))  # Empty list for corresponding authors
-  for (i in 1:length(data)) {  # Go through each record
-    authorship_info <- data[[i]]$authorships  # Get authorship info for each record
+  corresponding_authors <- vector("character", length(data)) 
+  for (i in 1:length(data)) {  
+    authorship_info <- data[[i]]$authorships  
     if (length(authorship_info) > 0) {
       cor_authors <- sapply(authorship_info, function(auth) {
         if (!is.null(auth$is_corresponding) && auth$is_corresponding == TRUE) {
-          return(auth$author$display_name)  # Get corresponding author's name
+          return(auth$author$display_name)  
         } else {
-          return(NA)  # If not a corresponding author, return NA
+          return(NA)  
         }
       })
-      corresponding_authors[i] <- paste(cor_authors[!is.na(cor_authors)], collapse = "; ")  # Combine corresponding authors
+      corresponding_authors[i] <- paste(cor_authors[!is.na(cor_authors)], collapse = "; ")  
     } else {
-      corresponding_authors[i] <- NA  # If no corresponding authors, put NA
+      corresponding_authors[i] <- NA  
     }
   }
-  return(corresponding_authors)  # Return the list of corresponding authors
+  return(corresponding_authors) 
 }
 
-
-
-# Function to get the publication date from each record
+### Function to pull publication date from each publication out of nested list ###
 get_publication_date <- function(data) {
-  publication_dates <- vector("character", length(data))  # Empty list for publication dates
-  for (i in 1:length(data)) {  # Go through each record
+  publication_dates <- vector("character", length(data))
+  for (i in 1:length(data)) {  
     if (!is.null(data[[i]]$publication_date)) {
-      publication_dates[i] <- data[[i]]$publication_date  # Get the publication date
+      publication_dates[i] <- data[[i]]$publication_date  
     } else {
-      publication_dates[i] <- NA  # If no publication date, put NA
+      publication_dates[i] <- NA  
     }
   }
-  return(publication_dates)  # Return the list of publication dates
+  return(publication_dates) 
 }
 
-# Extract APC information with a safety check for missing data
+### Function to pull APC information from each publication ###
 apc_info <- lapply(springer_data, function(data) {
   if (!is.null(data$apc_list)) {
     c(
@@ -106,10 +114,10 @@ apc_info <- lapply(springer_data, function(data) {
   }
 })
 
-# Convert the list to a data frame
+### Convert the APC data to data frame ###
 apc_df <- do.call(rbind, apc_info)
 
-#flatten grants
+### Function to pull grant data from each publication out of nested list ###
 grants_info <- lapply(springer_data, function(x) {
   if (!is.null(x$grants) && length(x$grants) > 0) {
     funders <- sapply(x$grants, function(g) g$funder)
@@ -130,10 +138,10 @@ grants_info <- lapply(springer_data, function(x) {
   }
 })
 
-# Convert to data frame
+### Convert grant data to data frame ###
 grants_df <- as.data.frame(do.call(rbind, grants_info))
 
-#flatten counts per year
+### Function to pull by year data from each publication out of nested list ###
 counts_by_year_info <-lapply(springer_data, function(x) {
   if(!is.null(x$counts_by_year) && length(x$counts_by_year) >0){
     year <- sapply(x$counts_by_year, function(g) g$year)
@@ -150,12 +158,13 @@ counts_by_year_info <-lapply(springer_data, function(x) {
   }
 })
 
+### Convert counts by year to data frame ###
 cby_df <- as.data.frame(do.call(rbind, counts_by_year_info))
 
+### Function to pull open access data from each publication out of nested list ###
 open_access_info <- lapply(springer_data, function(data) {
   if (!is.null(data$open_access) && length(data$open_access) > 0) {
     oa_entry <- data$open_access
-    
     return(c(
       openaccess_is_oa = if (!is.null(oa_entry$is_oa)) oa_entry$is_oa else NA,
       openaccess_oa_status = if (!is.null(oa_entry$oa_status)) oa_entry$oa_status else NA,
@@ -172,13 +181,10 @@ open_access_info <- lapply(springer_data, function(data) {
   }
 })
 
-
-
-
-# Convert the list to a data frame
+### Convert the open access data into a data frame ###
 oa_df <- as.data.frame(do.call(rbind, open_access_info), stringsAsFactors = FALSE)
     
-
+### Function to pull publisher display name from each publication out of nested list ###
 display_name_info <- lapply(springer_data, function(data) {
   display_name_var <- data$primary_location$source$display_name
   
@@ -193,23 +199,50 @@ display_name_info <- lapply(springer_data, function(data) {
   }
 })
 
+### Convert publisher display name data into a data frame ###
 display_name_df <- as.data.frame(do.call(rbind, display_name_info), stringsAsFactors = FALSE)
+
+### Function to pull issn data from each publication out of nested list ###
+issn_info <- lapply(springer_data, function(data) {
+  issn_info_var <- data$primary_location$source$issn
+  
+  if (length(issn_info_var) == 1) {
+    c(
+      issn_1 = if(!is.null(issn_info_var[[1]])) issn_info_var[[1]] else NA,
+      issn_2 = NA
+    )
+  } else if (length(issn_info_var) == 2) {
+    c(
+      issn_1 = if(!is.null(issn_info_var[[1]])) issn_info_var[[1]] else NA,
+      issn_2 = if(!is.null(issn_info_var[[2]])) issn_info_var[[2]] else NA
+    )
+  } else {
+    c(
+      issn_1 = NA,
+      issn_2 = NA
+    )
+  }
+})
+
+### Convert issn data into a data frame ###
+issn_df <- as.data.frame(do.call(rbind, issn_info), stringAsFactors = FALSE)
                      
-# Get the data we need from the records
+### Pull author and publication date data ###
 first_authors <- get_first_author(springer_data)
 all_authors <- get_all_authors(springer_data)
 corresponding_authors <- get_corresponding_author(springer_data)
 publication_dates <- get_publication_date(springer_data)
 
+#### Creating the output file ####
 
-# Create a simple table with the required columns
+### Create a table with selected columns ###
 final_table <- tibble(
-  id = sapply(springer_data, function(x) x$id),  # Extract publication ID
-  title = sapply(springer_data, function(x) x$title),  # Extract title
-  first_author = first_authors,  # Extract first author
-  all_authors = all_authors,  # Extract all authors
-  corresponding_author = corresponding_authors,  # Extract corresponding author
-  publication_date = publication_dates, # Extract publication date
+  id = sapply(springer_data, function(x) x$id), 
+  title = sapply(springer_data, function(x) x$title), 
+  first_author = first_authors,  
+  all_authors = all_authors, 
+  corresponding_author = corresponding_authors, 
+  publication_date = publication_dates,
   doi = sapply(springer_data, function(x) x$doi),
   publication_year = sapply(springer_data, function(x) x$publication_year),
   language = sapply(springer_data, function(x) x$language),
@@ -228,9 +261,13 @@ final_table <- tibble(
   openaccess_oa_status = oa_df[, "openaccess_oa_status"],
   openaccess_oa_url = oa_df[, "openaccess_oa_url"],
   openaccess_any_repository_has_fulltext = oa_df[, "openaccess_any_repository_has_fulltext"],
-  display_name = display_name_df[, "display_name"]
+  display_name = display_name_df[, "display_name"],
+  issn_1 = issn_df[, "issn_1"],
+  issn_2 = issn_df[, "issn_2"]
 )
 
-# Export the data to an Excel file
+### Export data to an Excel file ###
 write_xlsx(final_table, "springer_publications_partialcorrespauth.xlsx")
+
+### Tell user the data is exported ###
 print("Data exported to Excel successfully.")
