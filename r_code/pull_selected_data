@@ -273,10 +273,7 @@ final_table$language <- as.character(final_table$language)
 final_table$fwci <- as.numeric(final_table$fwci)
 
 ### Export data to an Excel file ###
-write_xlsx(final_table, "springer_publications_partialcorrespauth.xlsx")
-
-### Tell user the data is exported ###
-print("Data exported to Excel successfully.")
+write_xlsx(final_table, "selected_data.xlsx")
 
 ### Tell user the data is exported ###
 print("Data exported to Excel successfully.")
