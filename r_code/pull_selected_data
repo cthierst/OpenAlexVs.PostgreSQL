@@ -354,7 +354,6 @@ names(final_table) <- c(
   "ISSN 1", "ISSN 2", "Volume", "Issue", "First Page", "Last Page", "License"
 )
 
-
 ### Export data to an Excel file ###
 write_xlsx(final_table, "selected_data.xlsx")
 
