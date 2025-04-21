@@ -1,3 +1,11 @@
+-- Preamble --
+-- Purpose: Pulls a selection of data from the OpenAlex API for collection development purposes
+-- Author: Chloe Thierstein & Coral Markan Davidson
+-- Contact: chloe.thierstein@mail.utoronto.ca & coral.markan@mail.utoronto.ca
+-- Date: April 15, 2025
+-- License: MIT
+-- Pre-requisites: Need to have necessary packages downloaded and API set up for yourself.
+
 \copy (SELECT DISTINCT ON (publication.id) *  
 FROM publication 
 JOIN source ON source.id = publication.source_id  
