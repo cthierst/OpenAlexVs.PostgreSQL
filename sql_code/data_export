@@ -1,5 +1,5 @@
 -- Preamble --
--- Purpose: Pulls a selection of data from the OpenAlex API for collection development purposes
+-- Purpose: Provides a selection of data from the WOS PostgreSQL database for collection development purposes
 -- Author: Chloe Thierstein & Coral Markan Davidson
 -- Contact: chloe.thierstein@mail.utoronto.ca & coral.markan@mail.utoronto.ca
 -- Date: April 15, 2025
