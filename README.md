@@ -1,4 +1,4 @@
-# OpenAlexVs.PostgreSQL
+# Sustainable Data Collection in Scholarly Publishing: Leveraging OpenAlex API and WOS PostgreSQL 
 
 ## A Comparison of the Accessibility and Sustainability of OpenAlex and PostgreSQL from a Beginner Perspective
 
