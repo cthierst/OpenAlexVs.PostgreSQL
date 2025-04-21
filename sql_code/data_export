@@ -12,4 +12,4 @@ LEFT JOIN reference ON reference.citing_id = publication.id
 WHERE publication.year BETWEEN 2019 AND 2024 
 AND publisher.unified_name ILIKE ‘%Springer%’ 
 AND address.address ILIKE ‘%Univ Toronto%’)  
-TO ‘springer2019-2023.csv’ CSV HEADER; 
+TO ‘springer2019-2024.csv’ CSV HEADER; 
