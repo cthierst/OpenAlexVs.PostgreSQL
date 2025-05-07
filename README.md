@@ -14,7 +14,7 @@ Following the download of RStudio, you will need to download the packages associ
 -   `writexl`
 
 ## Downloading Data
-All data is pulled from OpenAlex and World of Science. No other data is needed.
+All data is pulled from OpenAlex and Web of Science. No other data is needed.
 
 ## Resources
 Using these tools and learning to code is difficult. We have provided some resources here to help you get started:
