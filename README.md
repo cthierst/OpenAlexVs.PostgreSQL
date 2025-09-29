@@ -1,6 +1,6 @@
 # Sustainable Data Collection in Scholarly Publishing: Leveraging OpenAlex API and WOS PostgreSQL 
 
-## A Comparison of the Accessibility and Sustainability of OpenAlex and PostgreSQL from a Beginner Perspective
+## A Comparison of the Accessibility and Sustainability of OpenAlex and WOS PostgreSQL from a Beginner Perspective
 
 ## Overview
 This repository contains all input files necessary to extract University of Toronto Springer data from OpenAlex and PostgreSQL. The aim of this comparison is to determine the usability of the data and the sustainability of using these resources, with an emphasis on a beginner perspective.
